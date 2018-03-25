@@ -1,0 +1,128 @@
+<html>
+<b>A  simple game javascript canvas </b>
+<body>
+<div class = "container">
+<center><canvas id = "myGame" width = "800" height = "600"></canvas>
+</center></div>
+ <script>
+ var canvas;
+ var canvasContext;
+ var ballx = 50;
+ var ballspeedx = 10;
+ var bally = 50;
+ var ballspeedy = 5;
+ var firstPaddleY = 250;
+ var secondPaddleY = 250;
+ const PADDLE_HEIGHT = 100;
+ const PADDLE_WIDTH = 10;
+
+ var player1Score = 0;
+ var player2Score = 0;
+
+ function calculateMousePos(evt){
+ 	var rect = canvas.getBoundingClientRect();
+ 	var root = document.documentElement ;
+ 	var mouseX = evt.clientX - rect.left - root.scrollLeft;
+ 	var mouseY = evt.clientY - rect.top - root.scrollTop;
+ 	return{
+ 		x:mouseX,
+ 		y:mouseY
+ 	};
+
+ }
+
+ window.onload = function(){
+ 	console.log("hello world!");
+ 	canvas = document.getElementById("myGame");
+ 	canvasContext = canvas.getContext('2d');
+ 	var framesPerSecond = 30;
+ 	setInterval(callFunctions, 1000/framesPerSecond);
+
+ 	canvas.addEventListener('mousemove', function(evt){
+ 			var mousePos = calculateMousePos(evt);
+ 			firstPaddleY = mousePos.y - (PADDLE_HEIGHT/2); 
+ 	});
+ }
+
+ function ballReset(){
+ 	ballspeedx = -ballspeedx;
+ 	ballx = canvas.width/2;
+ 	bally = canvas.height/2;
+ }
+ function computerPlayer(){
+ 	var secondPaddleYCenter = secondPaddleY + PADDLE_HEIGHT/2;
+ 	if(bally < secondPaddleYCenter-36){
+ 		secondPaddleY -= 5;
+ 	}
+ 	if(bally > secondPaddleYCenter+36){
+ 		secondPaddleY += 5;
+ 	}
+ }
+ function moveBall(){
+ 	computerPlayer();
+ 	ballx = ballx + ballspeedx;
+ 	bally = bally + ballspeedy;
+ 	//ballspeed += 1;
+ 	if(ballx >= canvas.width){
+ 		if(bally >= secondPaddleY && bally <= (secondPaddleY + PADDLE_HEIGHT)){
+ 			var deltaY = bally - (secondPaddleY + PADDLE_HEIGHT/2)
+ 		ballspeedx = -ballspeedx;
+ 	}
+ 	else{
+ 		ballReset();
+ 		player1Score++;
+ 	}
+ 	}
+ 	if(ballx < 0){
+ 		if(bally >= firstPaddleY && bally <= (firstPaddleY + PADDLE_HEIGHT)){
+ 			var deltaY = bally - (firstPaddleY + PADDLE_HEIGHT/2)
+ 		ballspeedx = -ballspeedx;
+ 	}
+ 	else{
+ 		ballReset();
+ 		player2Score++;
+ 	}
+ 	}
+ 	if(bally >= canvas.height){
+ 		ballspeedy = -ballspeedy;
+ 	}
+ 	if(bally < 0){
+ 		ballspeedy = -ballspeedy;
+ 	}
+ }
+ function callFunctions(){
+ 	drawEverything();
+ 	moveBall();
+ }
+ 
+ function drawEverything(){
+ 	
+ 	console.log(ballx);
+ 	drawRectangle(0,0,canvas.width,canvas.height,'black');
+ 	//drawRectangle(ballx,300,10,10,'red');
+ 	drawRectangle(0,firstPaddleY,PADDLE_WIDTH,PADDLE_HEIGHT,'white');
+ 	drawRectangle(canvas.width-PADDLE_WIDTH,secondPaddleY,PADDLE_WIDTH,PADDLE_HEIGHT,'white');
+ 	drawCircle(ballx,bally,10,'red');
+ 	canvasContext.fillStyle = 'white';
+ 	canvasContext.fillText("player1Score",80,80);
+ 	canvasContext.fillText(player1Score,100,100);
+ 	canvasContext.fillText("player2Score",canvas.width-120,80);
+ 	canvasContext.fillText(player2Score,canvas.width-100,100);
+ }
+
+function drawCircle(leftx, topx, radius, color){
+	canvasContext.fillStyle = color;
+	canvasContext.beginPath();
+	canvasContext.arc(leftx, topx, radius, 0, Math.PI*2, true);
+	canvasContext.fill();
+}
+
+ function drawRectangle(leftx, topx, width, height, color){
+ 	canvasContext.fillStyle = color;
+ 	canvasContext.fillRect(leftx,topx,width,height);
+ }
+
+
+ </script>
+</body>
+</html>
